@@ -1,4 +1,4 @@
-import { encryptPassword } from "src/utils/encrypt";
+import { encryptPassword } from "../utils/encrypt";
 import { Repository, User, Success, Error } from "../index.d";
 import { FactoryRepository } from "../utils/factory";
 import { Firestore } from "firebase-admin/firestore";

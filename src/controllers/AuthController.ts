@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Repository, User, Controller } from "../index.d";
 import { logger } from "../utils/logger";
 import * as dotenv from "dotenv";
-import { comparePasswords } from "src/utils/encrypt";
+import { comparePasswords } from "../utils/encrypt";
 
 dotenv.config();
 
