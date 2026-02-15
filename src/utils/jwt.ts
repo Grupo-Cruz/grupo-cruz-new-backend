@@ -3,9 +3,17 @@ import { JWT_SECRET } from "../config/api";
 import jwt from 'jsonwebtoken';
 
 export const generateToken = (payload: object, expiresIn: StringValue = '1d') => {
-    return jwt.sign(payload, JWT_SECRET!, { expiresIn });
+    try {
+        return jwt.sign(payload, JWT_SECRET!, { expiresIn });
+    } catch (error) {
+        console.log(`Error al generar el jwt: ${error}`);
+    }
 };
 
 export const verifyToken = (token: string) => {
-    return jwt.verify(token, JWT_SECRET!);
+    try {
+        return jwt.verify(token, JWT_SECRET!);
+    } catch (error) {
+        console.log(`Error al verificar el jwt: ${error}`);
+    }
 };

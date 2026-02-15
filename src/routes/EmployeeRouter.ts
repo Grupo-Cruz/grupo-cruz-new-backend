@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { db, bucket } from "../config/firebase";
+import { db, auth, bucket } from "../config/firebase";
 import { validateEmployee, validatePartialEmployee } from "../schemas/EmployeeSchema";
 import Cache from "../utils/Cache";
 import EC from "../controllers/EmployeeController";
@@ -12,7 +12,7 @@ import multer from 'multer';
 const EmployeeRepository = new ER(db);
 const UserRepository = new UR(db, "users");
 const ModuleRepository = new MR(db, "modules");
-const EmployeeController = new EC(bucket, EmployeeRepository, UserRepository, ModuleRepository, new Cache());
+const EmployeeController = new EC(bucket, EmployeeRepository, UserRepository, ModuleRepository, auth, new Cache());
 
 const EmployeeValidator = new VM(validateEmployee, EmployeeRepository);
 const EmployeeUpdaterValidator = new VM(validatePartialEmployee, EmployeeRepository);

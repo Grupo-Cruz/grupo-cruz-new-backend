@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { Firestore, Query } from "firebase-admin/firestore";
 import { Repository, Controller, GetAllDelimiters, GetByFieldDelimiters, Error, Success, Cache } from "../index.d";
 import { logger } from "./logger";
+import { expressIdToFirebaseId } from "./parser";
 
 /**
  * Clase `FactoryController`:
@@ -109,10 +110,7 @@ export class FactoryController<T> implements Controller<T> {
      * @param {Express.Response} res
      */
     async getById (req: Request, res: Response) {
-        let { id } = req.params;
-
-        if (typeof id !== 'string') id = id[0];
-
+        const id = expressIdToFirebaseId(req.params.id);
         const cacheKey = `${this.BASE_KEY}:id=${id}`;
         const cached = await this.cache.get<T>(cacheKey);
 
@@ -137,7 +135,7 @@ export class FactoryController<T> implements Controller<T> {
      * @param {Express.Response} res
      */
     async updateById (req: Request<any, any, PartialOrComplete<T>>, res: Response) {
-        const { id } = req.params;
+        const id = expressIdToFirebaseId(req.params.id);
         const data = req.body;
         const cacheKeyAll = `${this.BASE_KEY}:all`;
         const cacheKeyId = `${this.BASE_KEY}:id=${id}`;
@@ -157,10 +155,7 @@ export class FactoryController<T> implements Controller<T> {
      * @param {Express.Response} res
      */
     async deleteById (req: Request, res: Response) {
-        let { id } = req.params;
-
-        if (typeof id !== 'string') id = id[0];
-
+        const id = expressIdToFirebaseId(req.params.id);
         const cacheKeyAll = `${this.BASE_KEY}:all`;
         const cacheKeyId = `${this.BASE_KEY}:id=${id}`;
         const result = await this.repository.deleteById(id);

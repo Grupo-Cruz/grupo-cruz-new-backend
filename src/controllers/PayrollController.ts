@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { AssistanceLetter, Assistance, Schedule, Repository, Module, Employee } from "../index.d";
-import { NODE_ENV } from "../config/api";
+import { EXPRESS_ENV } from "../config/api";
 import GetPermissions from "../utils/Permissions";
 import Cache from "../utils/Cache";
 import fs from "fs/promises";
+import { expressIdToFirebaseId } from "../utils/parser";
 
 type KeyDayMap = "Dom" | "Lun" | "Mar" | "Mie" | "Mié" | "Jue" | "Vie" | "Sab" | "Sáb";
 type DayName = "Domingo" | "Lunes" | "Martes" | "Miércoles" | "Jueves" | "Viernes" | "Sábado";
@@ -171,7 +172,7 @@ export default class PayrollController {
         const totalDaysValidWorked = results.filter(r => r.hours > 0 && r.letter !== "ND").length;
         const totalEffectiveDaysWorked = Math.max(0, results.filter(r => r.hours > 0).length - Math.floor(totalR2R3 / 3));
 
-        if (NODE_ENV === "development") {
+        if (EXPRESS_ENV === "development") {
             console.log({ days: results, totalHours, totalR2R3, totalEffectiveDaysWorked, totalDaysWorked, totalFullDaysWorked, daysNotFullWorked, totalNotDefinedDaysWorked, totalDaysValidWorked, daysNotFullValidWorked, totalFullDaysValidWorked })
         }
 
@@ -321,10 +322,7 @@ export default class PayrollController {
     }
 
     calculatePayroll = async (req: Request, res: Response) => {
-        let { id: moduleId } = req.params;
-
-        if(typeof moduleId !== 'string') moduleId = moduleId[0];
-
+        const moduleId = expressIdToFirebaseId(req.params.id);
         const files = req.files as Array<Express.Multer.File> | undefined;
 
         try {
@@ -377,7 +375,7 @@ export default class PayrollController {
                 const pagoDescuento = descuentoDias * pagoDiario;
                 const pagoDeIncompletos = results.daysNotFullValidWorked.reduce((pay, r) => pay + Math.floor(r.hours) * pagoPorHora, 0);
 
-                if (NODE_ENV === "development") {
+                if (EXPRESS_ENV === "development") {
                     console.log({ pagoBase, pagoDeIncompletos })
                 }
 

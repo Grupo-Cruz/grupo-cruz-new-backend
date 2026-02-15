@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { db, bucket } from '../config/firebase';
+import { auth, db, bucket } from '../config/firebase';
 import { validateRegisterData } from '../schemas/AuthSchema';
 import Cache from '../utils/Cache';
 import Limiters from '../middlewares/RateLimiter';
@@ -12,8 +12,8 @@ import multer from 'multer';
 const upload = multer({ storage: multer.memoryStorage() });
 const UserRepository = new UR(db, "users");
 const UserValidator = new VM(validateRegisterData, UserRepository);
-const UserController = new UC(bucket, UserRepository, new Cache());
-const AuthController = new AC(UserRepository, UserController);
+const UserController = new UC(bucket, UserRepository, auth, new Cache());
+const AuthController = new AC(auth, UserRepository, UserController);
 export const router = Router();
 
 router.post(
@@ -23,10 +23,20 @@ router.post(
     AuthController.logIn
 );
 
+router.get(
+    "/me",
+    AuthController.me
+);
+
 router.post(
     "/register",
     upload.single('photo'),
     UserValidator.validateData,
     UserValidator.validateExistenceByField({ fieldName: "email", shouldExists: false }),
     AuthController.register
+);
+
+router.post(
+    "/logout", 
+    AuthController.logOut
 );

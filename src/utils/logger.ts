@@ -1,6 +1,6 @@
 import winston from "winston";
 import path from "path";
-import { NODE_ENV, LOG_LEVEL } from "../config/api";
+import { EXPRESS_ENV, LOG_LEVEL } from "../config/api";
 
 // Define ubicación de los logs
 const logDir = path.join(__dirname, "..", "logs");
@@ -24,7 +24,7 @@ export const logger = winston.createLogger({
 });
 
 // Si estás en desarrollo, también muestra los logs en consola
-if (NODE_ENV !== "production") {
+if (EXPRESS_ENV !== "production") {
     logger.add(new winston.transports.Console({
         format: winston.format.simple()
     }));

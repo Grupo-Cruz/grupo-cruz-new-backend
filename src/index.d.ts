@@ -51,6 +51,7 @@ export interface DefaultValues {
     id: string
     name: string
     email: string
+    emailVerifiedNotified: boolean
     photo?: string
     /** Para propósitos de borrar la imagen dentro del storage */
     relativePhoto?: string
@@ -75,7 +76,6 @@ export type Permissions = UserPermissions | GerentePermissions | AdminPermission
 
 export interface User extends DefaultValues {
     permissions: UserPermissions
-    password: string
 }
 
 export interface Employee extends Omit<Optional<User, "email">, "emailVerifiedNotified"> {

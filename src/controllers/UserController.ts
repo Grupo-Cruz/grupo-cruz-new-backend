@@ -3,13 +3,17 @@ import { Request, Response } from "express";
 import { Repository, User, Controller, Cache } from "../index.d";
 import { Bucket } from "@google-cloud/storage";
 import { FactoryController } from "../utils/factory";
+import { Auth } from 'firebase-admin/lib/auth/auth';
+import { expressIdToFirebaseId } from '../utils/parser';
 
 export default class UserController extends FactoryController<User> implements Controller<User> {
     private DEFAULT_IMAGE = "https://www.pngfind.com/pngs/m/610-6104451_image-placeholder-png-user-profile-placeholder-image-png.png";
     private bucket: Bucket;
+    private auth: Auth;
 
-    constructor (bucket: Bucket, repository: Repository<User>, cache: Cache, baseKey: string = "users") {
+    constructor (bucket: Bucket, repository: Repository<User>, auth: Auth, cache: Cache, baseKey: string = "users") {
         super (repository, baseKey, cache);
+        this.auth = auth;
         this.bucket = bucket;
     }
 
@@ -26,7 +30,7 @@ export default class UserController extends FactoryController<User> implements C
     }
 
     override updateById = async (req: Request<any, any, Partial<User>>, res: Response) => {
-        const { id } = req.params;
+        const id = expressIdToFirebaseId(req.params.id);
         const data = req.body;
 
         if (req.file) {

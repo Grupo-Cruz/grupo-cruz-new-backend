@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { Repository, Validator, Permissions } from "../index.d";
+import { expressIdToFirebaseId } from "../utils/parser";
 
 interface validateExistenceByFieldParams {
     fieldName: string
@@ -48,9 +49,7 @@ export default class ValidationMiddlewares<Input, Output, RepositoryType> {
      * Si no existe un elemento con esa id devuelve un error 404.
      */
     validateExistenceByID = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        let { id } = req.params;
-
-        if (typeof id !== 'string') id = id[0];
+        const id = expressIdToFirebaseId(req.params.id);
 
         if (!id) {
             res.status(400).json({ message: "No se especificó un ID", error: 'Se requiere especificar un ID' });

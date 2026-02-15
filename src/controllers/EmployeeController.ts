@@ -1,40 +1,74 @@
 import { Request, Response } from "express";
 import { Repository, Employee, User, Controller, Module, ReturnType, Cache } from "../index.d";
 import { FactoryController } from "../utils/factory";
+import { Auth } from "firebase-admin/lib/auth/auth";
 import { Bucket } from "@google-cloud/storage";
 import { v4 as uuidv4 } from "uuid";
+import { UserRecord } from "firebase-admin/lib/auth/user-record";
 
+/**
+ * Este controlador maneja dos flujos:
+ * 1. Si se pasa un `id`, se asume que el usuario ya existe y solo se crea el empleado.
+ * 2. Si se pasa `name`, `email` y `permissions`, se crea primero el usuario, y luego el empleado.
+ */
 export default class EmployeeController extends FactoryController<Employee> implements Controller<Employee> {
     private DEFAULT_IMAGE = "https://www.pngfind.com/pngs/m/610-6104451_image-placeholder-png-user-profile-placeholder-image-png.png";
     private bucket: Bucket;
     private userRepository: Repository<User>;
     private moduleRepository: Repository<Module>
+    private auth: Auth;
 
-    constructor (bucket: Bucket, employeeRepository: Repository<Employee>, userRepository: Repository<User>, moduleRepository: Repository<Module>, cache: Cache, baseKey: string = "employees") {
+    constructor (bucket: Bucket, employeeRepository: Repository<Employee>, userRepository: Repository<User>, moduleRepository: Repository<Module>, auth: Auth, cache: Cache, baseKey: string = "employees") {
         super (employeeRepository, baseKey, cache);
         this.bucket = bucket;
         this.userRepository = userRepository;
+        this.auth = auth;
         this.moduleRepository = moduleRepository;
     }
 
-    override create = async (req: Request<any, any, Partial<Employee> & { password: string }>, res: Response) => {
+    override create = async (req: Request<any, any, Partial<Employee> & { password?: string }>, res: Response) => {
         const data = req.body;
-        let userId = null;
+        let userId = data.id;
 
-        const userDoc = await this.userRepository.create({
-            name: data.name!,
-            email: data.email || "",
-            permissions: data.permissions!,
-            photo: "",
-            relativePhoto: ""
-        } as User);
+        if (!userId) {
+            try {
+                let firebaseUser: UserRecord;
 
-        if (!userDoc.success) {
-            res.status(500).json({ message: "Error al crear documento de usuario", error: userDoc.error });
-            return;
+                if (data.email) {
+                    firebaseUser = await this.auth.createUser({
+                        email: data.email,
+                        emailVerified: false,
+                        password: data.password || uuidv4(),
+                        displayName: data.name
+                    });
+                } else {
+                    firebaseUser = await this.auth.createUser({
+                        displayName: data.name
+                    });
+                }
+
+                const userDoc = await this.userRepository.create({
+                    id: firebaseUser.uid,
+                    name: data.name!,
+                    emailVerifiedNotified: false,
+                    email: data.email || "",
+                    permissions: data.permissions!,
+                    photo: "",
+                    relativePhoto: ""
+                });
+
+                if (!userDoc.success) {
+                    res.status(500).json({ message: "Error al crear documento de usuario", error: userDoc.error });
+                    return;
+                }
+
+                userId = userDoc.data.id;
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ message: "Error al crear usuario en Firebase Auth", error });
+                return;
+            }
         }
-
-        userId = userDoc.data.id;
 
         let photo: string | undefined, relativePhoto: string | undefined;
 
@@ -57,8 +91,7 @@ export default class EmployeeController extends FactoryController<Employee> impl
             semanalSalary: data.semanalSalary!,
             relativePhoto: data.relativePhoto || relativePhoto || "",
             active: data.active ?? true,
-            imss: data.imss ?? false,
-            password: data.password
+            imss: data.imss ?? false
         };
 
         const result = await this.repository.create(employeeData);

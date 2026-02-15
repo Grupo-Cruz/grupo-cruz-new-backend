@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { bucket, db } from "../config/firebase";
 import { validateUser, validatePartialUser } from "../schemas/UserSchema";
+import { auth } from "../config/firebase";
 import { Permissions } from "../index.d";
 import Cache from "../utils/Cache";
 import Limiters from "../middlewares/RateLimiter";
@@ -11,7 +12,7 @@ import VM from "../middlewares/ValidationMiddlewares";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const UserRepository = new UR(db, "users");
-const UserController = new UC(bucket, UserRepository, new Cache());
+const UserController = new UC(bucket, UserRepository, auth, new Cache());
 const UserValidator = new VM(validateUser, UserRepository);
 const UserUpdateValidator = new VM(validatePartialUser, UserRepository);
 
