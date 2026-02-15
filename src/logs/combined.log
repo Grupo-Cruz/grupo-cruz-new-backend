@@ -112,3 +112,15 @@ info: Entorno del node {"timestamp":"2025-07-01T16:26:27.607Z"}
 {"level":"info","message":"🔐 Login con token válido","timestamp":"2026-02-15T19:23:47.809Z","uid":"wUaIAJrRMEdlAohRr66nx5JXtA32"}
 {"ip":"::1","level":"info","message":"Se recibió un petición de la siguiente ip: ","timestamp":"2026-02-15T19:24:57.577Z"}
 {"ip":"::1","level":"info","message":"Se recibió un petición de la siguiente ip: ","timestamp":"2026-02-15T19:25:11.550Z"}
+{"EXPRESS_ENV":"development","level":"info","message":"Entorno del node: ","timestamp":"2026-02-15T19:44:15.908Z"}
+{"EXPRESS_ENV":"development","level":"info","message":"Entorno del node: ","timestamp":"2026-02-15T19:53:23.463Z"}
+{"EXPRESS_ENV":"development","level":"info","message":"Entorno del node: ","timestamp":"2026-02-15T19:55:28.631Z"}
+{"EXPRESS_ENV":"development","level":"info","message":"Entorno del node: ","timestamp":"2026-02-15T19:56:10.120Z"}
+{"EXPRESS_ENV":"development","level":"info","message":"Entorno del node: ","timestamp":"2026-02-15T20:03:08.308Z"}
+{"ip":"::1","level":"info","message":"Se recibió un petición de la siguiente ip: ","timestamp":"2026-02-15T20:03:30.638Z"}
+{"level":"info","message":"🔐 Login con token válido","timestamp":"2026-02-15T20:03:33.167Z","uid":"wUaIAJrRMEdlAohRr66nx5JXtA32"}
+{"ip":"::1","level":"info","message":"Se recibió un petición de la siguiente ip: ","timestamp":"2026-02-15T20:03:35.798Z"}
+{"ip":"::1","level":"info","message":"Se recibió un petición de la siguiente ip: ","timestamp":"2026-02-15T20:03:35.823Z"}
+{"ip":"::1","level":"info","message":"Se recibió un petición de la siguiente ip: ","timestamp":"2026-02-15T20:03:35.925Z"}
+{"ip":"::1","level":"info","message":"Se recibió un petición de la siguiente ip: ","timestamp":"2026-02-15T20:03:36.204Z"}
+{"EXPRESS_ENV":"development","level":"info","message":"Entorno del node: ","timestamp":"2026-02-15T20:05:36.610Z"}
